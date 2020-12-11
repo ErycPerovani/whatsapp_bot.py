@@ -182,7 +182,7 @@ if __name__ == "__main__":
         print("Buscando deals")
         driver.get("https://web.whatsapp.com/")
         print("Acessando o whatsapp")
-        driver.implicitly_wait(15)
+        driver.implicitly_wait(3600)
         number = get_owner_whatsapp_number()
         owner_deals = get_owner_deals(deals, number)
         if len(owner_deals) < 1:
