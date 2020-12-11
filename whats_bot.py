@@ -94,6 +94,12 @@ Me chamo {closer_name}, faço parte do time de consultores da LiberFly e estou a
 - Qual foi a data em que adquiriu a passagem?"""
         return msg
 
+    else:
+        msg = f"""Olá, {client_name}! Seja bem-vindo à experiência LiberFly!😃
+Me chamo {closer_name}, faço parte do time de consultores da LiberFly e estou aqui para te ajudar em relação ao seu transtorno com a {air_company}. Para entender melhor o ocorrido, e chegar na maior compensação financeira, preciso das seguintes informações:
+
+- Imagem da passagem original;"""
+        return msg
 
 def get_new_deals():
     return db().select(
@@ -218,7 +224,7 @@ if __name__ == "__main__":
 
             r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
             print(r)
-        driver.quit()
+        driver.close()
     except Exception as e:
         print(e)
-        driver.quit()
+        driver.close()
