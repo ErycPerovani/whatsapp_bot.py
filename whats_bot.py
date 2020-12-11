@@ -7,6 +7,7 @@ from urllib.parse import urlparse, parse_qs, quote, quote_plus
 from Liberfly.functions.db import db
 from Liberfly.functions.freshsales import fresh
 import re
+import os
 import time
 
 
@@ -170,15 +171,22 @@ def get_air_company(deal_id):
     )
     return air_company[0]['first_name']
 
+def update_bot():
+    os.system("git pull")
 
 if __name__ == "__main__":
+    update_bot()
+    driver = webdriver.Chrome()
     try:
-        driver = webdriver.Chrome()
         deals = get_new_deals()
+        print("Buscando deals")
         driver.get("https://web.whatsapp.com/")
+        print("Acessando o whatsapp")
         driver.implicitly_wait(15)
         number = get_owner_whatsapp_number()
         owner_deals = get_owner_deals(deals, number)
+        if len(owner_deals) < 1:
+            raise Exception("Nenhum deal para este owner")
         for deal in owner_deals:
             client_number = format_client_number(deal['client_mobile'])
             subject = get_subject(deal['cf_assunto'])
@@ -210,5 +218,7 @@ if __name__ == "__main__":
 
             r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
             print(r)
-    except:
-        driver.close()
+        driver.quit()
+    except Exception as e:
+        print(e)
+        driver.quit()
