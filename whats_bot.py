@@ -175,7 +175,7 @@ def update_bot():
     os.system("git pull")
 
 if __name__ == "__main__":
-    update_bot()
+    # update_bot()
     driver = webdriver.Chrome()
     try:
         deals = get_new_deals()
