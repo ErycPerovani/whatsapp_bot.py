@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
@@ -11,7 +12,18 @@ import os
 import time
 
 
-def msg_by_subject(subject, client_name, closer_name, air_company):
+def msg_by_subject(subject, client_name, closer_name, air_company): 
+    """[Método para pegar mensagem de acordo com  campo cf_assunto]
+
+    Args:
+        subject ([str]): [Assunto da reclamação]
+        client_name ([str]): [Primeiro nome do cliente]
+        closer_name ([str]): [Primeiro nome do closer]
+        air_company ([str]): [Nome da companhia aérea envolvida]
+
+    Returns:
+        [str]: [mensagem automatica de acordo com o assunto]
+    """
     if subject == "Atraso de voo":
         msg = f"""Olá, {client_name}! Seja bem-vindo à experiência LiberFly!😃
 Me chamo {closer_name}, faço parte do time de consultores da LiberFly e estou aqui para te ajudar em relação ao seu ATRASO DE VOO com a {air_company}. Para entender melhor o ocorrido, e chegar na maior compensação financeira, preciso das seguintes informações:
@@ -102,6 +114,11 @@ Me chamo {closer_name}, faço parte do time de consultores da LiberFly e estou a
         return msg
 
 def get_new_deals():
+    """[Método para buscar todos os deals na esteira "Novo"]
+
+    Returns:
+        [list]: [Lista de deals da esteira "Novo"]
+    """
     return db().select(
         """
         SELECT d.deal_id, d.name, d.cf_assunto, 
@@ -120,6 +137,15 @@ def get_new_deals():
 
 
 def get_owner_deals(deals, number):
+    """[Método para filtrar os deals na esteira "novo" de acordo com o owner]
+
+    Args:
+        deals ([list]): [lista de deals]
+        number ([str]): [número de telefone do owner]
+
+    Returns:
+        [list]: [lista de deals filtradas pelo owner]
+    """
     owner_deals = []
 
     for deal in deals:
@@ -130,6 +156,11 @@ def get_owner_deals(deals, number):
 
 
 def get_owner_whatsapp_number():
+    """[Método para verificar o número do owner que autenticou no whatsapp]
+
+    Returns:
+        [str]: [número do whatsapp do owner]
+    """
     image_url = driver.find_element_by_xpath(
         "//*[@id='side']/header/div[1]/div/img")
     val = image_url.get_attribute("src")
@@ -141,6 +172,14 @@ def get_owner_whatsapp_number():
 
 
 def blacklist(cf_assunto):
+    """[Método para remoção de assuntos que estão sendo enviados errado]
+
+    Args:
+        cf_assunto ([list]): [lista de assuntos]
+
+    Returns:
+        [list]: [lista de assuntos sem assuntos da blacklist]
+    """
     for subject in cf_assunto:
         if subject == "Perdi compromisso, mas não consigo comprovar" or subject == "Perdi e tenho comprovantes" or subject == "Não perdi":
             cf_assunto.remove(subject)
@@ -149,11 +188,19 @@ def blacklist(cf_assunto):
 
 
 def format_client_number(number):
+    """[summary]
+
+    Args:
+        number ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     return re.sub('[^0-9]', '', number)
 
 
 def get_subject(subject):
-    subject = deal['cf_assunto'].split(";")
+    subject = subject['cf_assunto'].split(";")
     subject = blacklist(subject)
     if len(subject) > 1 and subject[0] == 'Outro':
         return subject[1]
@@ -219,11 +266,18 @@ if __name__ == "__main__":
             driver.find_element_by_xpath(
                 "//*[@id='fallback_block']/div/div/a").click()
             time.sleep(2)
-            driver.find_element_by_xpath(
-                "//*[@id='main']/footer/div[1]/div[3]/button/span").click()
+            try:
+                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[2]/div/div/div"))).click()
+            
+            except TimeoutException:
+                print("Número válido")
 
-            r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
-            print(r)
+                driver.find_element_by_xpath(
+                    "//*[@id='main']/footer/div[1]/div[3]/button/span").click()
+
+                r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
+                print(r)
+                
         driver.close()
     except Exception as e:
         print(e)
