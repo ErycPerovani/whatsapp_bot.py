@@ -200,7 +200,7 @@ def format_client_number(number):
 
 
 def get_subject(subject):
-    subject = subject['cf_assunto'].split(";")
+    subject = subject.split(";")
     subject = blacklist(subject)
     if len(subject) > 1 and subject[0] == 'Outro':
         return subject[1]
@@ -235,7 +235,7 @@ if __name__ == "__main__":
         print("Buscando deals")
         driver.get("https://web.whatsapp.com/")
         print("Acessando o whatsapp")
-        driver.implicitly_wait(3600)
+        driver.implicitly_wait(10)
         number = get_owner_whatsapp_number()
         owner_deals = get_owner_deals(deals, number)
         if len(owner_deals) < 1:
@@ -259,25 +259,22 @@ if __name__ == "__main__":
             except TimeoutException:
                 print("no alert")
 
-            time.sleep(2)
             driver.find_element_by_class_name(
                 "_whatsapp_www__block_action").click()
-            time.sleep(2)
             driver.find_element_by_xpath(
                 "//*[@id='fallback_block']/div/div/a").click()
-            time.sleep(2)
-            try:
-                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[2]/div/div/div"))).click()
-            
-            except TimeoutException:
-                print("Número válido")
 
+            try:
+                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
+                continue
+                
+            except:
                 driver.find_element_by_xpath(
                     "//*[@id='main']/footer/div[1]/div[3]/button/span").click()
 
                 r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
                 print(r)
-                
+    
         driver.close()
     except Exception as e:
         print(e)
