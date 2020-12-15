@@ -238,44 +238,48 @@ if __name__ == "__main__":
         driver.implicitly_wait(10)
         number = get_owner_whatsapp_number()
         owner_deals = get_owner_deals(deals, number)
+        i = 0
         if len(owner_deals) < 1:
             raise Exception("Nenhum deal para este owner")
         for deal in owner_deals:
-            client_number = format_client_number(deal['client_mobile'])
-            subject = get_subject(deal['cf_assunto'])
-            msg = msg_by_subject(
-                subject, deal['first_name'], deal['owner_name'], get_air_company(deal['deal_id']))
-            msg = quote_plus(msg)
-            driver.get(
-                f"https://api.whatsapp.com/send?phone={client_number}&text={msg}")
-            try:
-                WebDriverWait(driver, 3).until(EC.alert_is_present(),
-                                            'Timed out waiting for PA creation ' +
-                                            'confirmation popup to appear.')
+            if i <= 20:
+                client_number = format_client_number(deal['client_mobile'])
+                subject = get_subject(deal['cf_assunto'])
+                msg = msg_by_subject(
+                    subject, deal['first_name'], deal['owner_name'], get_air_company(deal['deal_id']))
+                msg = quote_plus(msg)
+                driver.get(
+                    f"https://api.whatsapp.com/send?phone={client_number}&text={msg}")
+                try:
+                    WebDriverWait(driver, 3).until(EC.alert_is_present(),
+                                                'Timed out waiting for PA creation ' +
+                                                'confirmation popup to appear.')
 
-                alert = driver.switch_to.alert
-                alert.accept()
-                print("alert accepted")
-            except TimeoutException:
-                print("no alert")
+                    alert = driver.switch_to.alert
+                    alert.accept()
+                    print("alert accepted")
+                except TimeoutException:
+                    print("no alert")
 
-            driver.find_element_by_class_name(
-                "_whatsapp_www__block_action").click()
-            driver.find_element_by_xpath(
-                "//*[@id='fallback_block']/div/div/a").click()
-
-            try:
-                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
-                continue
-                
-            except:
+                driver.find_element_by_class_name(
+                    "_whatsapp_www__block_action").click()
                 driver.find_element_by_xpath(
-                    "//*[@id='main']/footer/div[1]/div[3]/button/span").click()
+                    "//*[@id='fallback_block']/div/div/a").click()
 
-                r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
-                print(r)
+                try:
+                    WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
+                    i += 1
+                    continue
+                    
+                except:
+                    driver.find_element_by_xpath(
+                        "//*[@id='main']/footer/div[1]/div[3]/button/span").click()
+
+                    r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
+                    print(r)
+                    i += 1
     
-        driver.close()
+            driver.close()
     except Exception as e:
         print(e)
         driver.close()
