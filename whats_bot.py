@@ -7,6 +7,8 @@ from selenium.common.exceptions import TimeoutException
 from urllib.parse import urlparse, parse_qs, quote, quote_plus
 from Liberfly.functions.db import db
 from Liberfly.functions.freshsales import fresh
+from datetime import datetime
+import pandas as pd
 import re
 import os
 import time
@@ -229,6 +231,7 @@ def update_bot():
 if __name__ == "__main__":
     # update_bot()
     driver = webdriver.Chrome()
+    report = []
     try:
         deals = get_new_deals()
         print("Buscando deals")
@@ -265,8 +268,9 @@ if __name__ == "__main__":
 
                 try:
                     WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
-                    i += 1 
-                    print(f"Error no deal: {deal['deal_id']}, {client_number}, número de whatsapp não existe")
+                    deal['contatado'] = "Falha"
+                    report.append(deal)
+                    i += 1
                     continue
                     
                 except:
@@ -274,9 +278,21 @@ if __name__ == "__main__":
 
                     r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
                     print(r)
+                    deal['contatado'] = "Sucesso"
+                    report.append(deal)
                     i += 1
-    
+        print("Gerando relatório")
+        df = pd.DataFrame.from_dict(report)
+        df = df[['deal_id', 'name', 'cf_assunto', 'client_mobile', 'contatado']]
+        a = str(datetime.now()).replace(":","-")
+        df.to_excel(f"C:/Users/Dell/Desktop/Relatorios bot/relatorio_{a}.xlsx")
         driver.close()
     except Exception as e:
         print(e)
+        
+        print("Gerando relatório")
+        df = pd.DataFrame.from_dict(report)
+        df = df[['deal_id', 'name', 'cf_assunto', 'client_mobile', 'contatado']]
+        a = str(datetime.now()).replace(":","-")
+        df.to_excel(f"C:/Users/Dell/Desktop/Relatorios bot/relatorio_{a}.xlsx")
         driver.close()
