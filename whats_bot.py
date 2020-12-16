@@ -269,6 +269,7 @@ if __name__ == "__main__":
                 try:
                     WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
                     i += 1
+                    print(f"Error no deal: {deal['deal_id']}, {client_number}, número de whatsapp não existe")
                     continue
                     
                 except:
