@@ -235,7 +235,7 @@ if __name__ == "__main__":
         print("Buscando deals")
         driver.get("https://web.whatsapp.com/")
         print("Acessando o whatsapp")
-        driver.implicitly_wait(30)
+        driver.implicitly_wait(15)
         number = get_owner_whatsapp_number()
         owner_deals = get_owner_deals(deals, number)
         i = 0
@@ -279,7 +279,7 @@ if __name__ == "__main__":
                     print(r)
                     i += 1
     
-            driver.quit()
+        driver.quit()
     except Exception as e:
         print(e)
         driver.quit()
