@@ -161,8 +161,7 @@ def get_owner_whatsapp_number():
     Returns:
         [str]: [número do whatsapp do owner]
     """
-    image_url = driver.find_element_by_xpath(
-        "//*[@id='side']/header/div[1]/div/img")
+    image_url = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.XPATH, "//*[@id='side']/header/div[1]/div/img")))
     val = image_url.get_attribute("src")
     o = urlparse(val)
     query = parse_qs(o.query)
@@ -235,7 +234,7 @@ if __name__ == "__main__":
         print("Buscando deals")
         driver.get("https://web.whatsapp.com/")
         print("Acessando o whatsapp")
-        driver.implicitly_wait(15)
+        # driver.implicitly_wait(15)
         number = get_owner_whatsapp_number()
         owner_deals = get_owner_deals(deals, number)
         i = 0
@@ -261,14 +260,12 @@ if __name__ == "__main__":
                 except TimeoutException:
                     print("no alert")
 
-                driver.find_element_by_class_name(
-                    "_whatsapp_www__block_action").click()
-                driver.find_element_by_xpath(
-                    "//*[@id='fallback_block']/div/div/a").click()
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='action-button']"))).click()
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='fallback_block']/div/div/a"))).click()
 
                 try:
-                    WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
-                    i += 1
+                    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
+                    i += 1 
                     print(f"Error no deal: {deal['deal_id']}, {client_number}, número de whatsapp não existe")
                     continue
                     
