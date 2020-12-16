@@ -280,7 +280,7 @@ if __name__ == "__main__":
                     print(r)
                     i += 1
     
-        driver.quit()
+        driver.close()
     except Exception as e:
         print(e)
-        driver.quit()
+        driver.close()
