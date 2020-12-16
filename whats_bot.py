@@ -270,8 +270,7 @@ if __name__ == "__main__":
                     continue
                     
                 except:
-                    driver.find_element_by_xpath(
-                        "//*[@id='main']/footer/div[1]/div[3]/button/span").click()
+                    WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='main']/footer/div[1]/div[3]/button/span"))).click()
 
                     r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
                     print(r)
