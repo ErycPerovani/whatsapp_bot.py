@@ -289,10 +289,11 @@ if __name__ == "__main__":
         driver.close()
     except Exception as e:
         print(e)
-        
-        print("Gerando relatório")
-        df = pd.DataFrame.from_dict(report)
-        df = df[['deal_id', 'name', 'cf_assunto', 'client_mobile', 'contatado']]
-        a = str(datetime.now()).replace(":","-")
-        df.to_excel(f"C:/Users/Dell/Desktop/Relatorios bot/relatorio_{a}.xlsx")
+        if len(owner_deals) > 1:
+            
+            print("Gerando relatório")
+            df = pd.DataFrame.from_dict(report)
+            df = df[['deal_id', 'name', 'cf_assunto', 'client_mobile', 'contatado']]
+            a = str(datetime.now()).replace(":","-")
+            df.to_excel(f"C:/Users/Dell/Desktop/Relatorios bot/relatorio_{a}.xlsx")
         driver.close()
