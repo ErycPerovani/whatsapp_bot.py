@@ -229,9 +229,10 @@ def update_bot():
     os.system("git pull")
 
 if __name__ == "__main__":
-    # update_bot()
+    update_bot()
     driver = webdriver.Chrome()
     report = []
+    contacted = []
     try:
         deals = get_new_deals()
         print("Buscando deals")
@@ -246,41 +247,49 @@ if __name__ == "__main__":
         for deal in owner_deals:
             if i <= 20:
                 client_number = format_client_number(deal['client_mobile'])
-                subject = get_subject(deal['cf_assunto'])
-                msg = msg_by_subject(
-                    subject, deal['first_name'], deal['owner_name'], get_air_company(deal['deal_id']))
-                msg = quote_plus(msg)
-                driver.get(
-                    f"https://api.whatsapp.com/send?phone={client_number}&text={msg}")
-                try:
-                    WebDriverWait(driver, 3).until(EC.alert_is_present(),
-                                                'Timed out waiting for PA creation ' +
-                                                'confirmation popup to appear.')
-
-                    alert = driver.switch_to.alert
-                    alert.accept()
-                    print("alert accepted")
-                except TimeoutException:
-                    print("no alert")
-
-                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='action-button']"))).click()
-                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='fallback_block']/div/div/a"))).click()
-
-                try:
-                    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
-                    deal['contatado'] = "Falha"
-                    report.append(deal)
-                    i += 1
-                    continue
-                    
-                except:
-                    WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='main']/footer/div[1]/div[3]/button/span"))).click()
-
+                if any(contact == client_number for contact in contacted):
+                    print('Número já contatado')
                     r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
                     print(r)
-                    deal['contatado'] = "Sucesso"
-                    report.append(deal)
-                    i += 1
+                    continue
+                else:
+                    subject = get_subject(deal['cf_assunto'])
+                    msg = msg_by_subject(
+                        subject, deal['first_name'], deal['owner_name'], get_air_company(deal['deal_id']))
+                    msg = quote_plus(msg)
+                    driver.get(
+                        f"https://api.whatsapp.com/send?phone={client_number}&text={msg}")
+                    try:
+                        WebDriverWait(driver, 3).until(EC.alert_is_present(),
+                                                    'Timed out waiting for PA creation ' +
+                                                    'confirmation popup to appear.')
+
+                        alert = driver.switch_to.alert
+                        alert.accept()
+                        print("alert accepted")
+                    except TimeoutException:
+                        print("no alert")
+
+                    WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='action-button']"))).click()
+                    WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='fallback_block']/div/div/a"))).click()
+
+                    try:
+                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
+                        deal['contatado'] = "Falha"
+                        report.append(deal)
+                        i += 1
+                        continue
+                        
+                    except:
+                        WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='main']/footer/div[1]/div[3]/button/span"))).click()
+
+                        r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
+                        print(r)
+                        deal['contatado'] = "Sucesso"
+                        report.append(deal)
+                        contacted.append(client_number)
+                        i += 1
+
         print("Gerando relatório")
         df = pd.DataFrame.from_dict(report)
         df = df[['deal_id', 'name', 'cf_assunto', 'client_mobile', 'contatado']]
