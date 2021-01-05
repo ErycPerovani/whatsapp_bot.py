@@ -272,7 +272,7 @@ if __name__ == "__main__":
 
                     WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='action-button']"))).click()
                     WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='fallback_block']/div/div/a"))).click()
-                    time.sleep(15)
+                    time.sleep(12)
                     
                     try:
                         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
@@ -283,6 +283,14 @@ if __name__ == "__main__":
                         
                     except:
                         WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='main']/footer/div[1]/div[3]/button/span"))).click()
+                        post = driver.find_elements_by_class_name("_2v8yt")
+                        ultimo = len(post) - 1
+                        svg = post[ultimo].find_element_by_css_selector("span")
+                        
+                        while svg.get_attribute('data-testid') != 'msg-dblcheck':
+                            post = driver.find_elements_by_class_name("_2v8yt")
+                            ultimo = len(post) - 1
+                            svg = post[ultimo].find_element_by_css_selector("span")
 
                         r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
                         print(r)
