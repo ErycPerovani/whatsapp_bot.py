@@ -163,7 +163,7 @@ def get_owner_whatsapp_number():
     Returns:
         [str]: [número do whatsapp do owner]
     """
-    image_url = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.XPATH, "//*[@id='side']/header/div[1]/div/img")))
+    image_url = WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, "//*[@id='side']/header/div[1]/div/img")))
     val = image_url.get_attribute("src")
     o = urlparse(val)
     query = parse_qs(o.query)
@@ -270,18 +270,19 @@ if __name__ == "__main__":
                     except TimeoutException:
                         print("no alert")
 
-                    WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='action-button']"))).click()
-                    WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='fallback_block']/div/div/a"))).click()
-
+                    WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='action-button']"))).click()
+                    WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='fallback_block']/div/div/a"))).click()
+                    time.sleep(15)
+                    
                     try:
-                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
+                        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
                         deal['contatado'] = "Falha"
                         report.append(deal)
                         i += 1
                         continue
                         
                     except:
-                        WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='main']/footer/div[1]/div[3]/button/span"))).click()
+                        WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='main']/footer/div[1]/div[3]/button/span"))).click()
 
                         r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
                         print(r)
@@ -294,7 +295,7 @@ if __name__ == "__main__":
         df = pd.DataFrame.from_dict(report)
         df = df[['deal_id', 'name', 'cf_assunto', 'client_mobile', 'contatado']]
         a = str(datetime.now()).replace(":","-")
-        df.to_excel(f"C:/Users/Dell/Desktop/Relatorios bot/relatorio_{a}.xlsx")
+        df.to_excel(f"C:/Users/LiberFly Bot/Desktop/Relatorios bot/relatorio_{a}.xlsx")
         driver.close()
     except Exception as e:
         print(e)
@@ -304,5 +305,5 @@ if __name__ == "__main__":
             df = pd.DataFrame.from_dict(report)
             df = df[['deal_id', 'name', 'cf_assunto', 'client_mobile', 'contatado']]
             a = str(datetime.now()).replace(":","-")
-            df.to_excel(f"C:/Users/Dell/Desktop/Relatorios bot/relatorio_{a}.xlsx")
+            df.to_excel(f"C:/Users/LiberFly Bot/Desktop/Relatorios bot/relatorio_{a}.xlsx")
         driver.close()
