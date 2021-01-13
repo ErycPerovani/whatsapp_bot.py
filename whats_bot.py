@@ -272,7 +272,6 @@ if __name__ == "__main__":
 
                     WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='action-button']"))).click()
                     WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='fallback_block']/div/div/a"))).click()
-                    time.sleep(12)
                     
                     try:
                         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//*[@id='app']/div/span[2]/div/span/div/div/div/div/div/div[1]")))
