@@ -294,8 +294,8 @@ if __name__ == "__main__":
                         post = driver.find_elements_by_class_name("_2v8yt")
                         ultimo = len(post) - 1
                         svg = post[ultimo].find_element_by_css_selector("span")
-                        
-                        while svg.get_attribute('data-testid') != 'msg-dblcheck':
+
+                        while svg.get_attribute('data-testid') == 'msg-time':
                             post = driver.find_elements_by_class_name("_2v8yt")
                             ultimo = len(post) - 1
                             svg = post[ultimo].find_element_by_css_selector("span")
