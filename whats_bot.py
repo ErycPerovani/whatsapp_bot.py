@@ -281,6 +281,15 @@ if __name__ == "__main__":
                         continue
                         
                     except:
+                        last_msg = WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "_2XJpe._7M8i6")))
+                        last_user_msg = last_msg[-1].find_element_by_css_selector("span")
+                        last_user_msg = last_user_msg.get_attribute("aria-label")
+                        if last_user_msg == 'Você:':
+                            print('Número já contatado')
+                            r = fresh().change_deal_stage(deal['deal_id'], 8000175215, deal_pipeline_id=8000024894)
+                            print(r)
+                            continue
+
                         WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='main']/footer/div[1]/div[3]/button/span"))).click()
                         post = driver.find_elements_by_class_name("_2v8yt")
                         ultimo = len(post) - 1
