@@ -5,10 +5,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from urllib.parse import urlparse, parse_qs, quote, quote_plus
-from Liberfly.functions.db import db
-from Liberfly.functions.freshsales import fresh
+# from Liberfly.functions.db import db
+# from Liberfly.functions.freshsales import fresh
 from datetime import datetime
-import pandas as pd
+#import pandas as pd
 import re
 import os
 import time
